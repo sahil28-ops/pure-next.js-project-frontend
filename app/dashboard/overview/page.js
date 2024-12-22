@@ -1,9 +1,6 @@
-const Overview = () => {
-  return (
-    <div>
-      <p>overview</p>
-    </div>
-  );
-};
+import Overview from "@/app/_components/dashboardComponents/OverView";
 
-export default Overview;
+const page = () => {
+  return <Overview />;
+};
+export default page;

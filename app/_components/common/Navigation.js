@@ -1,24 +1,27 @@
 "use client";
-import React, { useEffect, useState } from "react";
+
 import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { useRouter } from "next/navigation";
 
+import { useAuth } from "../_context/auth";
+
 const Navigation = () => {
-  const [auth, setAuth] = useState(null);
+  const [auth] = useAuth();
+  /// const [auth, setAuth] = useState(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const isLoggedIn = localStorage.getItem("auth");
-    if (!isLoggedIn) {
-      // router.push("/");
-    } else {
-      setAuth(JSON.parse(isLoggedIn));
-    }
-  }, []);
+  // useEffect(() => {
+  //   const isLoggedIn = localStorage.getItem("auth");
+  //   if (!isLoggedIn) {
+  //     // router.push("/");
+  //   } else {
+  //     setAuth(JSON.parse(isLoggedIn));
+  //   }
+  // }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("auth");
-    setAuth(null);
+    // setAuth(null);
     router.push("/");
   };
 
