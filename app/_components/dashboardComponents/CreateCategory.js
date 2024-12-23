@@ -1,62 +1,94 @@
 "use client";
-import { useEffect, useState } from "react";
-import { Form, Button, Table } from "react-bootstrap";
+
+import { useState } from "react";
+import { Form, Button, Table, Modal } from "react-bootstrap";
 import {
   fetchCategories,
   handleCreateCategory,
   handleDeleteCategory,
-} from "@/app/lib/action";
+  handleUpdateCategory,
+} from "../../lib/action";
 
-const CreateCategory =  () => {
+const CreateCategory = () => {
   const [category, setCategory] = useState("");
   const [categories, setCategories] = useState([]);
-  const [count, setCount] = useState(0);
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [updatedCategoryName, setUpdatedCategoryName] = useState("");
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    const getCategories = async () => {
-      try {
-        const data = await fetchCategories();
-        setCategories(data.categories || []);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    getCategories();
-  }, [count]);
-
-  const handleCategoryData = async (e) => {
-    e.preventDefault();
-
-    // Add the category
+  // Fetch categories
+  const getCategories = async () => {
     try {
-      const createCategory = await handleCreateCategory(category);
-      if (createCategory.success) {
-        console.log(createCategory.message);
-        setCount((prevCount) => prevCount + 1);
-      } else {
-        console.error(createCategory.message);
-      }
-
-      setCategory("");
+      const data = await fetchCategories();
+      setCategories(data.categories || []);
     } catch (error) {
-      console.error("Failed to add category:", error);
+      console.error("Error fetching categories:", error);
+      setError("Failed to load categories.");
     }
   };
 
-  // Delete a category
+  if (categories.length === 0 && !error) {
+    getCategories();
+  }
+
+  // Handle adding a category
+  const handleCategoryData = async (e) => {
+    e.preventDefault();
+    try {
+      const createCategory = await handleCreateCategory(category);
+      if (createCategory.success) {
+        setCategory("");
+        getCategories();
+      } else {
+        console.error(createCategory.message);
+        setError("Failed to create category.");
+      }
+    } catch (error) {
+      console.error("Failed to add category:", error);
+      setError("Error while adding category.");
+    }
+  };
+
   const handleDeleteCategoryClick = async (categoryId) => {
     try {
       const deleteCategory = await handleDeleteCategory(categoryId);
-
       if (deleteCategory.success) {
-        console.log(deleteCategory.message);
-        setCount((prevCount) => prevCount + 1);
+        getCategories();
       } else {
-        console.error(deleteCategory.message);
+        setError("Failed to delete category.");
       }
     } catch (error) {
-      console.error("Failed to delete category:", error);
+      setError("Error while deleting category.");
+    }
+  };
+
+  // Handle editing a category
+  const handleEditCategoryClick = (category) => {
+    setEditingCategory(category);
+    setUpdatedCategoryName(category.name);
+    setShowModal(true);
+  };
+
+  const handleUpdateCategoryClick = async (e) => {
+    e.preventDefault();
+    if (!editingCategory) return;
+
+    try {
+      const updateCategory = await handleUpdateCategory(
+        editingCategory._id,
+        updatedCategoryName
+      );
+      if (updateCategory.success) {
+        setUpdatedCategoryName("");
+        setEditingCategory(null);
+        setShowModal(false);
+        getCategories();
+      } else {
+        setError(updateCategory.message || "Failed to update category.");
+      }
+    } catch (error) {
+      setError("Error while updating category.");
     }
   };
 
@@ -78,6 +110,7 @@ const CreateCategory =  () => {
             Add Category
           </Button>
         </Form>
+        {error && <p className="text-danger">{error}</p>}
       </div>
 
       <h2 className="mt-4">Categories</h2>
@@ -86,7 +119,7 @@ const CreateCategory =  () => {
           <tr>
             <th>S.No</th>
             <th>Category</th>
-            <th>Action</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -96,10 +129,17 @@ const CreateCategory =  () => {
               <td>{curEle.name}</td>
               <td>
                 <Button
+                  variant="warning"
+                  size="sm"
+                  className="me-2"
+                  onClick={() => handleEditCategoryClick(curEle)}
+                >
+                  Edit
+                </Button>
+                <Button
                   variant="danger"
                   size="sm"
                   onClick={() => handleDeleteCategoryClick(curEle._id)}
-                  className="me-2"
                 >
                   Delete
                 </Button>
@@ -108,6 +148,34 @@ const CreateCategory =  () => {
           ))}
         </tbody>
       </Table>
+
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Category</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleUpdateCategoryClick}>
+            <Form.Group className="mb-3" controlId="editCategoryInput">
+              <Form.Control
+                type="text"
+                placeholder="Enter new category name"
+                value={updatedCategoryName}
+                onChange={(e) => setUpdatedCategoryName(e.target.value)}
+              />
+            </Form.Group>
+            <Button variant="primary" type="submit">
+              Update Category
+            </Button>
+            <Button
+              variant="secondary"
+              className="ms-2"
+              onClick={() => setShowModal(false)}
+            >
+              Cancel
+            </Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
     </>
   );
 };

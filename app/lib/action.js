@@ -39,7 +39,6 @@ export const fetchCategories = async () => {
   try {
     const response = await axios.get("http://localhost:3001/categories");
     return response.data;
-
   } catch (error) {
     console.log("Error fetching categories:", error);
   }
@@ -56,7 +55,7 @@ export const handleCreateCategory = async (category) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error creating category:", error);
+    console.log("Error creating category:", error);
   }
 };
 
@@ -72,5 +71,25 @@ export const handleDeleteCategory = async (categoryId) => {
     return response.data;
   } catch (error) {
     console.log("Error deleting category:", error);
+  }
+};
+
+////update category
+export const handleUpdateCategory = async (categoryId, updatedName) => {
+  if (!categoryId || !updatedName) {
+    return { success: false, message: "Category ID and name are required." };
+  }
+
+  try {
+    const response = await axios.put(
+      `http://localhost:3001/category/${categoryId}`,
+      {
+        name: updatedName,
+      }
+    );
+    return response.data; // Return success or error message
+  } catch (error) {
+    console.log("Error updating category:", error);
+    return { success: false, message: "Failed to update category" };
   }
 };
