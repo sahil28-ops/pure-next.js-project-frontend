@@ -1,27 +1,16 @@
-import Link from "next/link";
+import { Col, Row } from "react-bootstrap";
+import Sidenav from "../_components/Sidenav";
+import DashboardDetails from "../_components/common/DashboardDetails";
 const page = () => {
   return (
-    <div>
-      <h1>Dashboard page</h1>
-      <p>
-        <Link href="../dashboard/overview">go to overview</Link>
-      </p>
-      <p>
-        <Link href="../dashboard/profile">go to profile</Link>
-      </p>
-      <p>
-        <Link href="../dashboard/order">Orders</Link>
-      </p>
-      <p>
-        <Link href="../dashboard/wishList">Wishlist</Link>
-      </p>
-      <p>
-        <Link href="../dashboard/createCategeory">Create Categeory</Link>
-      </p>
-      <p>
-        <Link href="../dashboard/createProduct">Create Product</Link>
-      </p>
-    </div>
+    <Row>
+      <Col sm={3}>
+        <Sidenav />
+      </Col>
+      <Col sm={9}>
+        <DashboardDetails />
+      </Col>
+    </Row>
   );
 };
 

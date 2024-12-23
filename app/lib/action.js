@@ -1,20 +1,22 @@
 "use server";
 import axios from "axios";
+
+// Login Handler
 export const LoginHandler = async (formData) => {
   const { email, password } = formData;
-  //   await console.log(email, password);
   try {
     const response = await axios.post(`http://localhost:3001/login`, {
       email,
       password,
     });
-    // console.log(response)
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error("Error during login:", error);
+    throw error;
   }
 };
 
+// SignUp Handler
 export const SignUpHandler = async (formData) => {
   const { name, email, password, mobile, address } = formData;
   try {
@@ -27,41 +29,48 @@ export const SignUpHandler = async (formData) => {
     });
     return response.data;
   } catch (error) {
-    console.log(error);
-  }
-};
-
-export const fetchCategories = async () => {
-  try {
-    const response = await axios.get("http://localhost:3001/categories");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching categories:", error);
+    console.error("Error during signup:", error);
     throw error;
   }
 };
 
-// create category
+// Fetch Categories
+export const fetchCategories = async () => {
+  try {
+    const response = await axios.get("http://localhost:3001/categories");
+    return response.data;
 
-export const handleCreateCategory = async () => {
+  } catch (error) {
+    console.log("Error fetching categories:", error);
+  }
+};
+
+// Create Category
+export const handleCreateCategory = async (category) => {
+  if (!category) {
+    console.log("Category name is required.");
+  }
   try {
     const response = await axios.post(`http://localhost:3001/category`, {
       category,
     });
     return response.data;
   } catch (error) {
-    console.log("failed to create category");
+    console.error("Error creating category:", error);
   }
 };
 
-//delete category
-export const handleDeleteCategory = async () => {
+// Delete Category
+export const handleDeleteCategory = async (categoryId) => {
+  if (!categoryId) {
+    console.log("Category ID is required.");
+  }
   try {
     const response = await axios.delete(
       `http://localhost:3001/category/${categoryId}`
     );
     return response.data;
   } catch (error) {
-    console.log("failed to delete category");
+    console.log("Error deleting category:", error);
   }
 };
