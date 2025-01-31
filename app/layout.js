@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Navigation from "./_components/common/Navigation";
 import Footer from "./_components/common/Footer";
 import { AuthProvider } from "./_components/_context/auth";
+import { Addcart } from "./_components/_context/addCart";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,9 +26,11 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <AuthProvider>
-          <Navigation />
-          {children}
-          <Footer />
+          <Addcart>
+            <Navigation />
+            {children}
+            <Footer />
+          </Addcart>
         </AuthProvider>
       </body>
     </html>

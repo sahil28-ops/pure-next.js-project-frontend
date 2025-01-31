@@ -1,38 +1,57 @@
 "use client";
-import axios from "axios";
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  Children,
-} from "react";
 
-const authContext = createContext();
+import { createContext, useContext, useState, useEffect } from "react";
+
+// Create a context for authentication
+const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  //its an global state
+  // Global state for authentication
   const [auth, setAuth] = useState({
     user: null,
+    // Uncomment this if you're handling tokens
     // token: "",
   });
-  // axios.defaults.headers.common["Authorization"] = auth?.token;
+
+  // Update localStorage whenever auth state changes
   useEffect(() => {
+    if (auth?.user) {
+      localStorage.setItem("auth", JSON.stringify(auth)); // Store auth data in localStorage
+    }
+  }, [auth]); // Runs whenever auth changes
+
+  useEffect(() => {
+    // Retrieve auth data from localStorage on initial load
     const data = localStorage.getItem("auth");
     if (data) {
-      const parseData = JSON.parse(data);
+      const parsedData = JSON.parse(data);
       setAuth({
         ...auth,
-        user: parseData.user,
-        // token: parseData.token,
+        user: parsedData.user,
+        // Uncomment this line if you're handling tokens
+        // token: parsedData.token,
       });
     }
-  }, []);
+  }, []); // Runs only once when the component mounts
+
+  // Function to clear auth data
+  const clearAuth = () => {
+    setAuth({
+      user: null,
+      // Uncomment this if you're handling tokens
+      // token: "",
+    });
+    localStorage.removeItem("auth"); // Clear auth data from localStorage
+  };
+
   return (
-    <authContext.Provider value={[auth, setAuth]}>
+    <AuthContext.Provider value={[auth, setAuth, clearAuth]}>
       {children}
-    </authContext.Provider>
+    </AuthContext.Provider>
   );
 };
-const useAuth = () => useContext(authContext);
+
+// Hook to use the Auth context
+const useAuth = () => useContext(AuthContext);
+
 export { useAuth, AuthProvider };

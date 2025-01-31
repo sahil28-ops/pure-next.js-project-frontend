@@ -3,45 +3,119 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import { useEffect, useState } from "react";
+import { useAuth } from "../_context/auth";
+import { handleUpdateUserDetails } from "@/app/lib/action";
 
 function Profile() {
-  const [details, setDetails] = useState([]);
+  const [auth, setAuth] = useAuth(); // Use auth context for managing user state
+  const [profile, setProfile] = useState({
+    name: "",
+    email: "",
+    mobile: "",
+    address: "",
+    role: 0, // Default role
+  });
 
+  // Load initial data into state
   useEffect(() => {
-    const personalDetails = localStorage.getItem("auth");
-    if (personalDetails) {
-      setDetails(JSON.parse(personalDetails));
+    if (auth && auth.user) {
+      setProfile({
+        name: auth.user.name || "",
+        email: auth.user.email || "",
+        mobile: auth.user.mobile || "",
+        address: auth.user.address || "",
+        role: auth.user.role || 0, // Ensure role is captured
+      });
     }
-  }, []);
-  // const [name, setName] = useState(details?.user?.name);
-  console.log(details?.user?.name);
+  }, [auth]);
+
+  // Handle changes in form inputs
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setProfile({ ...profile, [name]: value });
+  };
+
+  // Save changes to auth state and localStorage
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!profile) return;
+    try {
+      const { email } = profile;
+      const response = await handleUpdateUserDetails(email, profile);
+
+      if (response.success) {
+        // Update auth state
+        const updatedAuth = {
+          ...auth,
+          user: {
+            ...profile,
+            role: profile.role, // Retain the role
+          },
+        };
+        setAuth(updatedAuth);
+
+        // Save to localStorage
+        localStorage.setItem("auth", JSON.stringify(updatedAuth));
+      }
+    } catch (error) {
+      console.error("Error while updating product:", error);
+    }
+  };
+
   return (
-    <Container>
-      <Form>
-        {/* First Name and Last Name */}
-        <div className="d-flex gap-3 mb-3">
-          <Form.Group controlId="Name" className="flex-grow-1">
-            <Form.Label>Name *</Form.Label>
-            <Form.Control type="text" />
-          </Form.Group>
-        </div>
+    <Container className="mt-5">
+      <h2 className="mb-4">Update Profile</h2>
+      <Form onSubmit={handleSubmit}>
+        {/* Name */}
+        <Form.Group controlId="name" className="mb-3">
+          <Form.Label>Name *</Form.Label>
+          <Form.Control
+            type="text"
+            name="name"
+            value={profile.name}
+            onChange={handleChange}
+            placeholder="Enter your name"
+            required
+          />
+        </Form.Group>
 
         {/* Email */}
         <Form.Group controlId="email" className="mb-3">
-          <Form.Label>Email Id *</Form.Label>
-          <Form.Control type="email" value={details?.user?.email} />
+          <Form.Label>Email *</Form.Label>
+          <Form.Control
+            type="email"
+            name="email"
+            value={profile.email}
+            onChange={handleChange}
+            placeholder="Enter your email"
+            required
+            disabled
+          />
         </Form.Group>
 
-        {/* Mobile Number */}
+        {/* Mobile */}
         <Form.Group controlId="mobile" className="mb-3">
           <Form.Label>Mobile Number *</Form.Label>
-          <Form.Control type="tel" value={details?.user?.mobile} />
+          <Form.Control
+            type="tel"
+            name="mobile"
+            value={profile.mobile}
+            onChange={handleChange}
+            placeholder="Enter your mobile number"
+            required
+          />
         </Form.Group>
 
-        {/* address */}
+        {/* Address */}
         <Form.Group controlId="address" className="mb-3">
           <Form.Label>Address</Form.Label>
-          <Form.Control type="text" value={details?.user?.address} />
+          <Form.Control
+            type="text"
+            name="address"
+            value={profile.address}
+            onChange={handleChange}
+            placeholder="Enter your address"
+          />
         </Form.Group>
 
         {/* Submit Button */}

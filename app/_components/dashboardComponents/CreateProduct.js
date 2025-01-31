@@ -1,60 +1,69 @@
 "use client";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Form, Button } from "react-bootstrap";
+import { fetchCategories, handleCreateProduct } from "../../lib/action";
 
 const CreateProduct = () => {
-  const [categories, setCategories] = useState([]);
-  const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState([]); // fetch categories from the server and store them in state
   const [product, setProduct] = useState({
     name: "",
     description: "",
     price: "",
-  });
-  useEffect(() => {
-    const fetchCategory = async () => {
-      let response = await fetch(`http://localhost:3001/categories`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch categories");
-      }
-      let data = await response.json();
-      setCategories(data.categories);
-    };
-    fetchCategory();
-  }, []);
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setProduct((product) => ({
-      ...product,
-      [name]: value,
-    }));
-  };
-  const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
+    categoryId: "",
+  }); // store the product data in state
+  const [error, setError] = useState(""); // store error message in state
+
+  // Fetch categories from the server
+  const getCategories = async () => {
+    try {
+      const data = await fetchCategories();
+      setCategories(data.categories || []);
+    } catch (error) {
+      console.log("Error fetching categories:", error);
+      setError("Failed to load categories.");
+    }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const { name, description, price } = product;
-    const response = await axios.post(`http://localhost:3001/product`, {
-      name,
-      description,
-      price,
-    });
-    if (response.data.success) {
-      console.log(response.data.message);
-    } else if (response.data.message) {
-      console.log(response.data.message);
-    }
-    setProduct({ name: "", description: "", price: "" });
+  if (categories.length === 0 && !error) {
+    getCategories();
+  }
+
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setProduct((prevProduct) => ({ ...prevProduct, [name]: value }));
   };
-  console.log(categories);
-  console.log(category);
-  console.log(product);
+
+  // Handle category selection changes
+  const handleCategoryChange = (e) => {
+    const selectedCategoryId = e.target.value;
+    setProduct((prevProduct) => ({
+      ...prevProduct,
+      categoryId: selectedCategoryId,
+    }));
+  };
+
+  // Handle form submission
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+
+    // submit the product data to the server
+    try {
+      const createProduct = await handleCreateProduct(product);
+      if (createProduct.success) {
+        console.log(createProduct.message);
+        setProduct({ name: "", description: "", price: "", categoryId: "" });
+      } else if (createProduct.message) {
+        console.log(createProduct.message);
+      }
+    } catch (error) {
+      console.log("Error submitting product:", error);
+    }
+  };
 
   return (
     <>
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleFormSubmit}>
         <Form.Label>Product Name</Form.Label>
         <Form.Control
           type="text"
@@ -78,7 +87,7 @@ const CreateProduct = () => {
 
         <Form.Label>Price</Form.Label>
         <Form.Control
-          type="number"
+          type="text"
           placeholder="Enter product price"
           name="price"
           value={product.price}
@@ -86,15 +95,16 @@ const CreateProduct = () => {
           required
         />
 
+        <Form.Label>Select Category</Form.Label>
         <Form.Select
           aria-label="Select category"
-          value={category}
+          value={product.categoryId}
           onChange={handleCategoryChange}
           required
         >
           <option value="">Open this select menu</option>
           {categories.map((item) => (
-            <option key={item.id} value={item.id}>
+            <option key={item._id} value={item._id}>
               {item.name}
             </option>
           ))}

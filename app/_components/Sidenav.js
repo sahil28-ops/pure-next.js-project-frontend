@@ -11,11 +11,16 @@ const Sidenav = () => {
       <ul className="nav flex-column">
         <li className="nav-item mb-2">
           <Link href="../dashboard/profile" className="nav-link text-dark">
-            <i className="bi bi-speedometer2"></i> Dashboard
+            <i className="bi bi-speedometer2"></i> overview
           </Link>
         </li>
         {auth?.user?.role === 1 ? (
           <>
+            <li className="nav-item mb-2">
+              <Link href="../dashboard/profile" className="nav-link text-dark">
+                <i className="bi bi-person"></i> Profile
+              </Link>
+            </li>
             <li className="nav-item mb-2">
               <Link
                 href="../dashboard/createCategeory"
@@ -33,7 +38,10 @@ const Sidenav = () => {
               </Link>
             </li>
             <li className="nav-item mb-2">
-              <Link href="../dashboard/order" className="nav-link text-dark">
+              <Link
+                href="../dashboard/allProducts"
+                className="nav-link text-dark"
+              >
                 <i className="bi bi-box"></i> All Products
               </Link>
             </li>

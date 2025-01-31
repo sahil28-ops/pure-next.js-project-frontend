@@ -1,6 +1,6 @@
-import Order from "@/app/_components/dashboardComponents/Order";
-import { Row, Col } from "react-bootstrap"; 
+import { Row, Col } from "react-bootstrap";
 import Sidenav from "@/app/_components/Sidenav";
+import AllProduct from "@/app/_components/dashboardComponents/AllProduct";
 const page = () => {
   return (
     <Row>
@@ -8,7 +8,7 @@ const page = () => {
         <Sidenav />
       </Col>
       <Col sm={9}>
-        <Order />
+        <AllProduct />
       </Col>
     </Row>
   );

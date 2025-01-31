@@ -1,0 +1,12 @@
+/* styleNavigation.css */
+.nav-item.dropdown:hover .dropdown-menu {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.nav-item.dropdown .dropdown-toggle::after {
+    display: none;
+    /* Remove the dropdown arrow */
+}
