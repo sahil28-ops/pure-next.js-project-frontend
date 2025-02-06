@@ -6,7 +6,7 @@ const Sidenav = () => {
   const [auth] = useAuth();
 
   return (
-    <div className="d-flex flex-column bg-light vh-100 p-3 shadow">
+    <div className="d-flex flex-column bg-light min-vh-100 p-3 shadow">
       <h4 className="mb-4">Admin Panel</h4>
       <ul className="nav flex-column">
         <li className="nav-item mb-2">

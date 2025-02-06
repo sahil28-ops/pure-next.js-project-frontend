@@ -122,21 +122,35 @@ export const handleUpdateCategory = async (categoryId, updatedName) => {
 // ------------------------- Product start ---------------------------------------
 
 // create Product
+
+// create Product
+
 export const handleCreateProduct = async (product) => {
-  if (!product) {
-    console.log("product name is required");
-  }
   try {
-    const { name, description, price, categoryId } = product;
-    const response = await axios.post(`http://localhost:3001/product`, {
+    console.log("Sending Product Data:", product);
+
+    const { name, description, price, categoryId, images } = product;
+    const response = await axios.post("http://localhost:3001/product", {
       name,
       description,
       price,
       categoryId,
+      images,
     });
+
+    console.log("Product Created Successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.log("error while creating Product", error);
+    console.error(
+      "Error while creating product:",
+      error.response?.data || error.message
+    );
+    return {
+      success: false,
+      message:
+        error.response?.data?.error ||
+        "Unable to create product. Check your network connection.",
+    };
   }
 };
 
@@ -144,50 +158,45 @@ export const handleCreateProduct = async (product) => {
 export const handleFetchProduct = async () => {
   try {
     const response = await fetch(`http://localhost:3001/products`);
-    // console.log(response.data);
-    return response.json();
+    if (!response.ok) {
+      throw new Error("Failed to fetch products");
+    }
+    return await response.json();
   } catch (error) {
-    console.log("error while fetching the products", error);
+    console.error("Error fetching products:", error);
+    return [];
   }
 };
 
 // delete product
-export const handleDeleteProduct = async (productId) => {
-  if (!productId) {
-    console.log("product ID is required.");
-  }
+
+export const handleDeleteProduct = async (id) => {
   try {
-    const response = await axios.delete(
-      `http://localhost:3001/product/${productId}`
-    );
-    return response.data;
+    const response = await axios.delete(`http://localhost:3001/product/${id}`);
+    return response.data; // Corrected: No parentheses needed
   } catch (error) {
-    console.log("Error deleting category:", error);
+    console.error("Error deleting product:", error);
+    return { success: false, error: "Failed to delete product." };
   }
 };
 
 // update product
-export const handleUpdateProduct = async (productId, updatedData) => {
-  if (!productId || !updatedData) {
-    return {
-      success: false,
-      message: "product id and all fields are required.",
-    };
-  }
+
+export const handleUpdateProduct = async (id, updatedProduct) => {
   try {
-    const response = await axios.put(
-      `http://localhost:3001/product/${productId}`,
-      {
-        name: updatedData.name,
-        description: updatedData.description,
-        price: updatedData.price,
-        categoryId: updatedData.categoryId,
-      }
-    );
-    return response.data;
+    const response = await axios.put(`http://localhost:3001/product/${id}`, {
+      name: updatedProduct.name,
+      description: updatedProduct.description,
+      price: updatedProduct.price,
+      categoryId: updatedProduct.categoryId,
+      images: updatedProduct.images, // Add images if updating them
+    });
+
+    return response.data; // Corrected: No need for parentheses
   } catch (error) {
-    console.log("Error updating product:", error);
-    return { success: false, message: "Failed to update product" };
+    console.error("Error updating product:", error);
+    return { success: false, error: "Failed to update product." };
   }
 };
+
 // ------------------------- Product end -----------------------------------------

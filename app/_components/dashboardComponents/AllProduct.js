@@ -1,239 +1,183 @@
-"use client";
-import {
-  fetchCategories,
-  handleDeleteProduct,
-  handleFetchProduct,
-  handleUpdateProduct,
-} from "../../lib/action";
-import { useState } from "react";
-import { Button, Table, Modal, Form } from "react-bootstrap";
+ 'use client'
+ 
+ import { useState, useEffect } from "react";
+import { handleFetchProduct, handleDeleteProduct, handleUpdateProduct } from "../../lib/action";
+import { Card, Button, Row, Col, Container, Spinner, Alert, Modal, Form } from "react-bootstrap";
 
-const AllProduct = () => {
-  const [categories, setCategories] = useState([]);
+const AllProducts = () => {
   const [products, setProducts] = useState([]);
-  const [editProduct, setEditProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState(null);
   const [updatedProduct, setUpdatedProduct] = useState({
     name: "",
     description: "",
     price: "",
     categoryId: "",
+    images: "",
   });
-  const [showModal, setShowModal] = useState(false);
-  const [error, setError] = useState("");
 
-  // Fetch products and categories if not already loaded
-  const initializeData = async () => {
-    if (products.length === 0) {
+  useEffect(() => {
+    const fetchProducts = async () => {
       try {
-        const data = await handleFetchProduct();
-        setProducts(data.products || []);
+        const productData = await handleFetchProduct();
+        setProducts(productData || []);
       } catch (err) {
-        console.error("Error fetching products:", err);
         setError("Failed to load products.");
+      } finally {
+        setLoading(false);
       }
-    }
+    };
 
-    if (categories.length === 0) {
-      try {
-        const data = await fetchCategories();
-        setCategories(data.categories || []);
-      } catch (err) {
-        console.error("Error fetching categories:", err);
-        setError("Failed to load categories.");
-      }
-    }
-  };
+    fetchProducts();
+  }, []);
 
-  // Call initializeData conditionally
-  if (products.length === 0 || categories.length === 0) {
-    initializeData();
-  }
-
-  // Delete product
-  const handleDeleteProductClick = async (productId) => {
-    try {
-      const deleteproduct = await handleDeleteProduct(productId);
-      if (deleteproduct.success) {
-        setProducts((prev) =>
-          prev.filter((product) => product._id !== productId)
-        );
-      } else {
-        setError("Error while deleting product.");
-      }
-    } catch (err) {
-      setError("Error while deleting product.");
-    }
-  };
-
-  // Edit product
-  const handleEditProductClick = (product) => {
-    setEditProduct(product);
+  const handleShowModal = (product) => {
+    setCurrentProduct(product);
     setUpdatedProduct({
       name: product.name,
       description: product.description,
       price: product.price,
       categoryId: product.categoryId,
+      images: product.images,
     });
     setShowModal(true);
   };
 
-  // Update product
-  const handleUpdateProductClick = async (e) => {
-    e.preventDefault();
-    if (!editProduct) return;
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setUpdatedProduct({
+      name: "",
+      description: "",
+      price: "",
+      categoryId: "",
+      images: "",
+    });
+  };
 
+  const handleUpdate = async () => {
     try {
-      const updateProduct = await handleUpdateProduct(
-        editProduct._id,
-        updatedProduct
-      );
-      if (updateProduct.success) {
-        setEditProduct(null);
-        setUpdatedProduct({
-          name: "",
-          description: "",
-          price: "",
-          categoryId: "",
-        });
-        setShowModal(false);
-        setProducts((prev) =>
-          prev.map((product) =>
-            product._id === editProduct._id
-              ? { ...product, ...updatedProduct }
-              : product
+      const result = await handleUpdateProduct(currentProduct._id, updatedProduct);
+      if (result.success) {
+        // Update the product in the list
+        setProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product._id === currentProduct._id ? { ...product, ...updatedProduct } : product
           )
         );
+        handleCloseModal();
       } else {
-        setError(updateProduct.message || "Failed to update product.");
+        setError("Failed to update product.");
       }
     } catch (err) {
-      console.error("Error while updating product:", err);
-      setError("Error while updating product.");
+      setError("Error updating product.");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const result = await handleDeleteProduct(id);
+    if (result.success) {
+      // Remove the deleted product from the list
+      setProducts(products.filter((product) => product._id !== id));
+    } else {
+      setError("Failed to delete product.");
     }
   };
 
   return (
-    <div>
-      <h2 className="mt-4">All products</h2>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>S.No</th>
-            <th>Product</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((curEle, index) => (
-            <tr key={curEle._id || index}>
-              <td>{index + 1}</td>
-              <td>{curEle.name}</td>
-              <td>
-                <Button
-                  variant="warning"
-                  size="sm"
-                  className="me-2"
-                  onClick={() => handleEditProductClick(curEle)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => handleDeleteProductClick(curEle._id)}
-                >
-                  Delete
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+    <Container className="mt-4">
+      {/* <h2 className="text-center mb-4">All Products</h2> */}
+      {loading && <Spinner animation="border" />}
+      {error && <Alert variant="danger">{error}</Alert>}
+      <Row>
+        {products.length > 0 ? (
+          products.map((product) => (
+            <Col key={product._id} md={4} className="mb-4">
+              <Card className="h-100 shadow">
+                <div className="image-container">
+                  <Card.Img
+                    variant="top"
+                    src={product.images?.[0] || "/placeholder.jpg"}
+                    alt={product.name}
+                    className="product-image"
+                  />
+                </div>
+                <Card.Body className="d-flex flex-column">
+                  <Card.Title className="text-truncate">{product.name}</Card.Title>
+                  <Card.Text className="flex-grow-1 text-muted">{product.description}</Card.Text>
+                  <Card.Text className="fw-bold">Price: ${product.price}</Card.Text>
+                  <Button variant="primary" className="mt-auto" onClick={() => handleShowModal(product)}>Edit</Button>
+                  <Button variant="danger" className="mt-2" onClick={() => handleDelete(product._id)}>Delete</Button>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))
+        ) : (
+          !loading && <p className="text-center">No products available</p>
+        )}
+      </Row>
 
-      {/* Modal for Editing Product */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      {/* Modal for Update Product */}
+      <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Edit Product</Modal.Title>
+          <Modal.Title>Update Product</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleUpdateProductClick}>
-            <Form.Group className="mb-3" controlId="editProductName">
-              <Form.Label>Product Name</Form.Label>
+          <Form>
+            <Form.Group controlId="productName">
+              <Form.Label>Name</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter new product name"
-                value={updatedProduct.name || ""}
-                onChange={(e) =>
-                  setUpdatedProduct((prev) => ({
-                    ...prev,
-                    name: e.target.value,
-                  }))
-                }
+                value={updatedProduct.name}
+                onChange={(e) => setUpdatedProduct({ ...updatedProduct, name: e.target.value })}
               />
             </Form.Group>
-            <Form.Group className="mb-3" controlId="editProductDescription">
-              <Form.Label>Product Description</Form.Label>
+            <Form.Group controlId="productDescription">
+              <Form.Label>Description</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter new product description"
-                value={updatedProduct.description || ""}
-                onChange={(e) =>
-                  setUpdatedProduct((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
+                value={updatedProduct.description}
+                onChange={(e) => setUpdatedProduct({ ...updatedProduct, description: e.target.value })}
               />
             </Form.Group>
-            <Form.Group className="mb-3" controlId="editProductPrice">
-              <Form.Label>Product Price</Form.Label>
+            <Form.Group controlId="productPrice">
+              <Form.Label>Price</Form.Label>
               <Form.Control
                 type="number"
-                placeholder="Enter new product price"
-                value={updatedProduct.price || ""}
-                onChange={(e) =>
-                  setUpdatedProduct((prev) => ({
-                    ...prev,
-                    price: e.target.value,
-                  }))
-                }
+                value={updatedProduct.price}
+                onChange={(e) => setUpdatedProduct({ ...updatedProduct, price: e.target.value })}
               />
             </Form.Group>
-            <Form.Group className="mb-3" controlId="editProductCategoryId">
+            <Form.Group controlId="productCategoryId">
               <Form.Label>Category</Form.Label>
-              <Form.Select
-                value={updatedProduct.categoryId || ""}
-                onChange={(e) =>
-                  setUpdatedProduct((prev) => ({
-                    ...prev,
-                    categoryId: e.target.value,
-                  }))
-                }
-              >
-                <option value="">Select a Category</option>
-                {categories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.name}
-                  </option>
-                ))}
-              </Form.Select>
+              <Form.Control
+                type="text"
+                value={updatedProduct.categoryId}
+                onChange={(e) => setUpdatedProduct({ ...updatedProduct, categoryId: e.target.value })}
+              />
             </Form.Group>
-
-            <Button variant="primary" type="submit">
-              Update Product
-            </Button>
-            <Button
-              variant="secondary"
-              className="ms-2"
-              onClick={() => setShowModal(false)}
-            >
-              Cancel
-            </Button>
+            <Form.Group controlId="productImages">
+              <Form.Label>Images</Form.Label>
+              <Form.Control
+                type="text"
+                value={updatedProduct.images}
+                onChange={(e) => setUpdatedProduct({ ...updatedProduct, images: e.target.value })}
+              />
+            </Form.Group>
           </Form>
         </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleUpdate}>
+            Update
+          </Button>
+        </Modal.Footer>
       </Modal>
-    </div>
+    </Container>
   );
 };
 
-export default AllProduct;
+export default AllProducts;
