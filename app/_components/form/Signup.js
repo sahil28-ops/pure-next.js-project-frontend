@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { SignUpHandler } from "@/app/lib/action";
+import { SignUpHandler } from "../../lib/action";
+
 const SignUp = () => {
   const [signup, setSignUp] = useState({
     name: "",
@@ -29,7 +29,7 @@ const SignUp = () => {
     },
     {
       name: "mobile",
-      type: "number",
+      type: "text",
       placeholder: "Enter Mobile Number",
       label: "Mobile No",
     },
@@ -40,6 +40,7 @@ const SignUp = () => {
       label: "Address",
     },
   ];
+
   const router = useRouter();
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -48,8 +49,10 @@ const SignUp = () => {
       const data = { name, email, password, mobile, address };
       const result = await SignUpHandler(data);
       if (result.success) {
-        console.log(result.message);
+        console.log(result.message, "signUp successful");
+        router.push("/login");
       } else {
+        console.log(result.message || "Invalid credentaials");
       }
       setSignUp({ name: "", email: "", password: "", mobile: "", address: "" });
     } catch (error) {
@@ -88,7 +91,7 @@ const SignUp = () => {
               </div>
             ))}
           </div>
-          <button type="submit" className="btn btn-success w-100 mt-4">
+          <button type="submit" className="btn btn-primary w-100 mt-4">
             Sign Up
           </button>
           <p className="mt-3">

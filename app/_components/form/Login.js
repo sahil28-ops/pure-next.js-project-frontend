@@ -1,52 +1,37 @@
 "use client";
+ 
 import { useState } from "react";
 import Link from "next/link";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../_context/auth";
 import { LoginHandler } from "../../lib/action";
 
 const Login = () => {
   const [login, setLogin] = useState({ email: "", password: "" });
+  const [auth, setAuth] = useAuth(); // Access auth context
   const router = useRouter();
 
-  //   const handleLoginUpData = async (e) => {
-  //     e.preventDefault();
-  //     const { email, password } = login;
-  //     try {
-  //       const response = await axios.post(`http://localhost:3001/login`, {
-  //         email,
-  //         password,
-  //       });
-  //       if (response.data.success) {
-  //         console.log(response.data.message);
-  //         router.push("/");
-  //         localStorage.setItem("auth", JSON.stringify(response.data));
-  //       } else if (response.data.message) {
-  //         console.log(response.data.message);
-  //       }
-  //     } catch (error) {
-  //       console.error("Login failed", error);
-  //     }
-  //     setLogin({ email: "", password: "" });
-  //   };
-
   const submitHandler = async (e) => {
+    e.preventDefault();
     const { email, password } = login;
     try {
       const data = { email, password };
       const result = await LoginHandler(data);
-      // console.log(result)
-      if (result.sucess) {
-        console.log("login sucessful");
-        router.push("/");
+      console.log(result);
+
+      if (result.success) {
+        console.log("Login successful");
+        setAuth(result); // Update auth context (this triggers the useEffect in AuthProvider to sync with localStorage)
+        router.push("/"); // Redirect to the home page
       } else {
         console.log(result.message || "Invalid credentials");
       }
       setLogin({ email: "", password: "" });
     } catch (error) {
-      console.error("Error during login:", error);
+      console.log("Error during login:", error);
     }
   };
+
   return (
     <div className="container d-flex justify-content-center align-items-center my-5">
       <div
@@ -57,7 +42,7 @@ const Login = () => {
           <h1 className="h4">Welcome Back</h1>
           <p className="text-muted">Log in to your account</p>
         </div>
-        <form action={submitHandler}>
+        <form onSubmit={submitHandler}>
           <div className="mb-3">
             <label htmlFor="email" className="form-label">
               Email
