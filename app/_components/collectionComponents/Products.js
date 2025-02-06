@@ -7,7 +7,7 @@ import { handleFetchProduct } from "../../lib/action"; // Assuming this fetches 
 
 const Products = () => {
   const [products, setProducts] = useState([]);
-  const { setAdd } = useAddcart(); // Access setAdd from context
+  const { setAdd } = useAddcart(); // Access setAdd from context/
 
   useEffect(() => {
     const initializeData = async () => {
@@ -20,7 +20,7 @@ const Products = () => {
     };
     initializeData();
   }, []); 
-//
+
   return (
     <div>
       <h2 className="mt-4">Products</h2>
