@@ -20,7 +20,7 @@ const Products = () => {
     };
     initializeData();
   }, []); 
-
+//
   return (
     <div>
       <h2 className="mt-4">Products</h2>
