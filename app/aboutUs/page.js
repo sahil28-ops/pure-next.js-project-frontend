@@ -1,76 +1,87 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Image from "next/image";
-import { useState } from "react";
+import { motion } from "framer-motion";
 
-export default function AboutUs() {
-  const [hover, setHover] = useState(false);
-
+const AboutUs = () => {
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="bg-gray-100 min-h-screen text-gray-800">
       {/* Hero Section */}
-      <section className="relative w-full h-[500px] flex items-center justify-center bg-black text-white text-center">
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/a/a6/Brandenburg_gate.jpg"
-          alt="Brandenburg Gate"
-          width={500}
-          height={300}
-        />
-
-        <h1 className="relative text-5xl font-bold">About Our Store</h1>
-      </section>
-
-      {/* Our Story */}
-      <section className="py-16 px-8 md:px-20">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
+      <div className="relative w-full h-[400px] flex items-center justify-center bg-blue-500 text-white text-center">
+        <motion.h1
+          initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center"
+          transition={{ duration: 0.8 }}
+          className="text-4xl font-bold"
         >
-          <h2 className="text-3xl font-bold">Our Story</h2>
-          <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-            We started with a simple mission—to make online shopping seamless
-            and enjoyable. Our platform brings you the best products with
-            top-notch service.
-          </p>
-        </motion.div>
-      </section>
-
-      {/* Why Choose Us */}
-      <section className="bg-gray-100 py-16 px-8 md:px-20">
-        <h2 className="text-3xl font-bold text-center">Why Choose Us?</h2>
-        <div className="grid md:grid-cols-3 gap-8 mt-8">
-          {["High Quality", "Fast Delivery", "24/7 Support"].map(
-            (feature, index) => (
-              <motion.div
-                key={index}
-                whileHover={{ scale: 1.05 }}
-                className="bg-white p-6 rounded-lg shadow-md text-center"
-              >
-                <h3 className="text-xl font-semibold">{feature}</h3>
-                <p className="mt-2 text-gray-600">
-                  We ensure the best quality, fastest delivery, and
-                  round-the-clock support.
-                </p>
-              </motion.div>
-            )
-          )}
+          Welcome to Our Company
+        </motion.h1>
+      </div>
+      
+      {/* Our Mission */}
+      <div className="container mx-auto py-12 px-6 text-center">
+        <motion.h2
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          className="text-3xl font-semibold mb-6"
+        >
+          Our Mission
+        </motion.h2>
+        <p className="max-w-3xl mx-auto text-lg">
+          We are committed to revolutionizing the e-commerce industry by providing seamless and efficient logistics solutions. Our goal is to ensure timely and hassle-free deliveries for businesses and consumers alike.
+        </p>
+      </div>
+      
+      {/* Our Operations */}
+      <div className="container mx-auto py-12 px-6">
+        <h2 className="text-3xl font-semibold text-center mb-6">Our Operations</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Image 1 */}
+          <motion.div whileHover={{ scale: 1.05 }} className="relative w-full h-64">
+            <img
+              src="https://media.istockphoto.com/id/1428709516/photo/shopping-online-woman-hand-online-shopping-on-laptop-computer-with-virtual-graphic-icon.jpg?s=612x612&w=0&k=20&c=ROAncmFL4lbSQdU4VOhyXu-43ngzfEqHE5ZZAw5FtYk="
+              alt="Shopping Online"
+              layout="fill"
+              
+              className="rounded-lg shadow-md"
+            />
+          </motion.div>
+          {/* Image 2 */}
+          <motion.div whileHover={{ scale: 1.05 }} className="relative w-full h-64">
+            <img
+              src="https://media.istockphoto.com/id/1311600080/photo/small-shipping-packages-on-a-notebook-with-the-inscription-online-shopping.jpg?s=612x612&w=0&k=20&c=vDPqIQsqzCvEaEZF2R5IeGz_8Gv-YRI_HzbKux8TaqM="
+              alt="Shipping Packages"
+              layout="fill"
+              objectFit="cover"
+              className="rounded-lg shadow-md"
+            />
+          </motion.div>
+          {/* Image 3 */}
+          <motion.div whileHover={{ scale: 1.05 }} className="relative w-full h-64">
+            <img
+              src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgbUMmWHihw8FWaeAV1ChChcFGiyd1P_75K4LZXMi_FemjkYKb0CcQDO6ZhvL3TcSJoGq0v7W1Y4wpOr6fGY_KXNO18x9UMfbQnnPlANig9_zh9dtHO-NfXQxlIRIGtsOFkAH9_lrMkQ2kiW2FnDmdiT43U51c3Yzqb-1EmonKOvceoIWp4SJ2dZcqu/s16000-rw/Fulfilment%20Center_Coimbatore_Ecom%20Express.jpg"
+              alt="Fulfillment Center"
+              layout="fill"
+              objectFit="cover"
+              className="rounded-lg shadow-md"
+            />
+          </motion.div>
         </div>
-      </section>
-
-      {/* Interactive Section */}
-      <section className="py-16 px-8 md:px-20 text-center">
-        <h2 className="text-3xl font-bold">Our Customers Love Us!</h2>
-        <motion.button
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
-          className="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg shadow-md"
-        >
-          {hover ? "Join Us Now!" : "See Testimonials"}
-        </motion.button>
-      </section>
+      </div>
+      
+      {/* Call to Action */}
+      <div className="bg-blue-500 text-white py-12 text-center mt-12">
+        <h2 className="text-3xl font-bold mb-4">Partner with Us!</h2>
+        <p className="max-w-xl mx-auto text-lg">
+          Join us in redefining the logistics industry. Let's create seamless and efficient e-commerce solutions together.
+        </p>
+        <button className="mt-6 px-6 py-3 bg-white text-blue-500 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition-all">
+          Contact Us
+        </button>
+      </div>
     </div>
   );
-}
+};
+
+export default AboutUs;

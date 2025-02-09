@@ -36,11 +36,11 @@ const CreateCategory = () => {
         setCategory("");
         getCategories(); // Refresh categories
       } else {
-        console.error(createCategory.message);
+        console.log(createCategory.message);
         setError("Failed to create category.");
       }
     } catch (error) {
-      console.error("Failed to add category:", error);
+      console.log("Failed to add category:", error);
       setError("Error while adding category.");
     }
   };

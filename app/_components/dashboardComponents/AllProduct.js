@@ -1,12 +1,26 @@
- 'use client'
- 
- import { useState, useEffect } from "react";
-import { handleFetchProduct, handleDeleteProduct, handleUpdateProduct } from "../../lib/action";
-import { Card, Button, Row, Col, Container, Spinner, Alert, Modal, Form } from "react-bootstrap";
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+  handleFetchProduct,
+  handleDeleteProduct,
+  handleUpdateProduct,
+} from "../../lib/action";
+import {
+  Card,
+  Button,
+  Row,
+  Col,
+  Container,
+  Spinner,
+  Alert,
+  Modal,
+  Form,
+} from "react-bootstrap";
 
 const AllProducts = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
@@ -25,8 +39,6 @@ const AllProducts = () => {
         setProducts(productData || []);
       } catch (err) {
         setError("Failed to load products.");
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -58,12 +70,17 @@ const AllProducts = () => {
 
   const handleUpdate = async () => {
     try {
-      const result = await handleUpdateProduct(currentProduct._id, updatedProduct);
+      const result = await handleUpdateProduct(
+        currentProduct._id,
+        updatedProduct
+      );
       if (result.success) {
         // Update the product in the list
         setProducts((prevProducts) =>
           prevProducts.map((product) =>
-            product._id === currentProduct._id ? { ...product, ...updatedProduct } : product
+            product._id === currentProduct._id
+              ? { ...product, ...updatedProduct }
+              : product
           )
         );
         handleCloseModal();
@@ -91,31 +108,47 @@ const AllProducts = () => {
       {loading && <Spinner animation="border" />}
       {error && <Alert variant="danger">{error}</Alert>}
       <Row>
-        {products.length > 0 ? (
-          products.map((product) => (
-            <Col key={product._id} md={4} className="mb-4">
-              <Card className="h-100 shadow">
-                <div className="image-container">
-                  <Card.Img
-                    variant="top"
-                    src={product.images?.[0] || "/placeholder.jpg"}
-                    alt={product.name}
-                    className="product-image"
-                  />
-                </div>
-                <Card.Body className="d-flex flex-column">
-                  <Card.Title className="text-truncate">{product.name}</Card.Title>
-                  <Card.Text className="flex-grow-1 text-muted">{product.description}</Card.Text>
-                  <Card.Text className="fw-bold">Price: ${product.price}</Card.Text>
-                  <Button variant="primary" className="mt-auto" onClick={() => handleShowModal(product)}>Edit</Button>
-                  <Button variant="danger" className="mt-2" onClick={() => handleDelete(product._id)}>Delete</Button>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))
-        ) : (
-          !loading && <p className="text-center">No products available</p>
-        )}
+        {products.length > 0
+          ? products.map((product) => (
+              <Col key={product._id} md={4} className="mb-4">
+                <Card className="h-100 shadow">
+                  <div className="image-container">
+                    <Card.Img
+                      variant="top"
+                      src={product.images?.[0] || "/placeholder.jpg"}
+                      alt={product.name}
+                      className="product-image"
+                    />
+                  </div>
+                  <Card.Body className="d-flex flex-column">
+                    <Card.Title className="text-truncate">
+                      {product.name}
+                    </Card.Title>
+                    <Card.Text className="flex-grow-1 text-muted">
+                      {product.description}
+                    </Card.Text>
+                    <Card.Text className="fw-bold">
+                      Price: ${product.price}
+                    </Card.Text>
+                    <Button
+                      variant="primary"
+                      className="mt-auto"
+                      onClick={() => handleShowModal(product)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="danger"
+                      className="mt-2"
+                      onClick={() => handleDelete(product._id)}
+                    >
+                      Delete
+                    </Button>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))
+          : !loading && <p className="text-center">No products available</p>}
       </Row>
 
       {/* Modal for Update Product */}
@@ -130,7 +163,9 @@ const AllProducts = () => {
               <Form.Control
                 type="text"
                 value={updatedProduct.name}
-                onChange={(e) => setUpdatedProduct({ ...updatedProduct, name: e.target.value })}
+                onChange={(e) =>
+                  setUpdatedProduct({ ...updatedProduct, name: e.target.value })
+                }
               />
             </Form.Group>
             <Form.Group controlId="productDescription">
@@ -138,7 +173,12 @@ const AllProducts = () => {
               <Form.Control
                 type="text"
                 value={updatedProduct.description}
-                onChange={(e) => setUpdatedProduct({ ...updatedProduct, description: e.target.value })}
+                onChange={(e) =>
+                  setUpdatedProduct({
+                    ...updatedProduct,
+                    description: e.target.value,
+                  })
+                }
               />
             </Form.Group>
             <Form.Group controlId="productPrice">
@@ -146,7 +186,12 @@ const AllProducts = () => {
               <Form.Control
                 type="number"
                 value={updatedProduct.price}
-                onChange={(e) => setUpdatedProduct({ ...updatedProduct, price: e.target.value })}
+                onChange={(e) =>
+                  setUpdatedProduct({
+                    ...updatedProduct,
+                    price: e.target.value,
+                  })
+                }
               />
             </Form.Group>
             <Form.Group controlId="productCategoryId">
@@ -154,7 +199,12 @@ const AllProducts = () => {
               <Form.Control
                 type="text"
                 value={updatedProduct.categoryId}
-                onChange={(e) => setUpdatedProduct({ ...updatedProduct, categoryId: e.target.value })}
+                onChange={(e) =>
+                  setUpdatedProduct({
+                    ...updatedProduct,
+                    categoryId: e.target.value,
+                  })
+                }
               />
             </Form.Group>
             <Form.Group controlId="productImages">
@@ -162,7 +212,12 @@ const AllProducts = () => {
               <Form.Control
                 type="text"
                 value={updatedProduct.images}
-                onChange={(e) => setUpdatedProduct({ ...updatedProduct, images: e.target.value })}
+                onChange={(e) =>
+                  setUpdatedProduct({
+                    ...updatedProduct,
+                    images: e.target.value,
+                  })
+                }
               />
             </Form.Group>
           </Form>

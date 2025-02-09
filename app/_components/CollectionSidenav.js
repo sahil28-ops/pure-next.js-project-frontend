@@ -1,27 +1,26 @@
 "use client";
-import Link from "next/link";
-import { useAuth } from "./_context/auth";
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation"; 
 import { fetchCategories } from "../lib/action";
 
 const CollectionSidenav = () => {
-  const [auth] = useAuth();
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedCategory = searchParams.get("category"); 
 
   // Fetch categories
-  const getCategories = async () => {
-    try {
-      const data = await fetchCategories();
-      setCategories(data.categories || []);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-      setError("Failed to load categories.");
-    }
-  };
-
-  // Initial fetch
   useEffect(() => {
+    const getCategories = async () => {
+      try {
+        const data = await fetchCategories();
+        setCategories(data.categories || []);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        setError("Failed to load categories.");
+      }
+    };
     getCategories();
   }, []);
 
@@ -31,17 +30,22 @@ const CollectionSidenav = () => {
       <h4 className="mb-4">Categories</h4>
       {error && <p className="text-danger">{error}</p>}
       <ul className="nav flex-column">
-        {categories.map((category, index) => (
-          <li
-            key={category.id || `${category.slug}-${index}`}
-            className="nav-item mb-2"
+        <li className="nav-item mb-2">
+          <button
+            onClick={() => router.push("/collection")}
+            className={`nav-link text-dark ${!selectedCategory ? "fw-bold" : ""}`}
           >
-            <Link
-              href={`/collection/${category.slug}`}
-              className="nav-link text-dark"
+            All Products
+          </button>
+        </li>
+        {categories.map((category) => (
+          <li key={category.slug} className="nav-item mb-2">
+            <button
+              onClick={() => router.push(`/collection?category=${category.slug}`)}
+              className={`nav-link text-dark ${selectedCategory === category.slug ? "fw-bold" : ""}`}
             >
-              <i className="bi bi-speedometer2"></i> {category.name}
-            </Link>
+              {category.name}
+            </button>
           </li>
         ))}
       </ul>
