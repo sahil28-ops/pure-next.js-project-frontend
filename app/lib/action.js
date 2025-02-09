@@ -161,12 +161,17 @@ export const handleFetchProduct = async () => {
     if (!response.ok) {
       throw new Error("Failed to fetch products");
     }
-    return await response.json();
+    const data = await response.json();
+    console.log("🔍 API Response:", data); // Debugging Log
+    return data;
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error("🚨 Error fetching products:", error);
     return [];
   }
 };
+
+
+
 
 // delete product
 

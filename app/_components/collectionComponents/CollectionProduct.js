@@ -4,7 +4,7 @@ function CollectionProduct() {
   return (
     <div>
       <div>
-        <h4 className="mt-4">Products</h4>
+        <h4 className="mt-4">CollectionProduct</h4>
         <ul className="list-group">
           {products.map((product) => (
             <li key={product.id} className="list-group-item">
